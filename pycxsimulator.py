@@ -1,3 +1,7 @@
+import PyQt6.QtCore
+import os
+os.environ["QT_API"] = "pyqt5"
+
 ## "pycxsimulator.py"
 ## Dynamic, interactive simulation GUI for PyCX
 ##
@@ -25,19 +29,11 @@
 ## began at 2016-06-15(Wed) 17:10:17
 ## fixed grid() and pack() problem on 2016-06-21(Tue) 18:29:40
 ##
-## various bug fixes and updates by Steve Morgan on 3/28/2020
 
 import matplotlib
+matplotlib.use('TkAgg')
 
-#System check added by Steve Morgan
-import platform #SM 3/28/2020
-if platform.system() == 'Windows': #SM 3/28/2020
-    backend = 'TkAgg'              #SM 3/28/2020
-else:                              #SM 3/28/2020
-    backend = 'Qt5Agg'             #SM 3/28/2020
-matplotlib.use(backend)            #SM 3/28/2020
-
-import matplotlib.pyplot as plt #SM 3/28/2020
+import pylab
 
 ## version check added by Hiroki Sayama on 01/08/2019
 import sys
@@ -48,9 +44,6 @@ else:                        # Python 2
     from Tkinter import *
     from ttk import Notebook
 
-## suppressing matplotlib deprecation warnings (especially with subplot) by Hiroki Sayama on 06/29/2020
-import warnings
-warnings.filterwarnings("ignore", category = matplotlib.cbook.MatplotlibDeprecationWarning)
 
 class GUI:
 
@@ -264,12 +257,12 @@ class GUI:
         self.drawModel()
 
     def drawModel(self):
-        plt.ion() #SM 3/26/2020
-        if self.modelFigure == None or self.modelFigure.canvas.manager.window == None: 
-            self.modelFigure = plt.figure() #SM 3/26/2020
+        pylab.ion() # bug fix by Alex Hill in 2013
+        if self.modelFigure == None or self.modelFigure.canvas.manager.window == None:
+            self.modelFigure = pylab.figure()
         self.modelDrawFunc()
         self.modelFigure.canvas.manager.window.update()
-        plt.show() # bug fix by Hiroki Sayama in 2016 #SM 3/26/2020
+        pylab.show() # bug fix by Hiroki Sayama in 2016
 
     def start(self,func=[]):
         if len(func)==3:
@@ -289,15 +282,15 @@ class GUI:
         self.rootWindow.mainloop()
 
     def quitGUI(self):
-        self.running = False # HS 06/29/2020
+        pylab.close('all')
         self.rootWindow.quit()
-        plt.close('all') # HS 06/29/2020
         self.rootWindow.destroy()
     
     def showHelp(self, widget,text):
         def setText(self):
             self.statusText.set(text)
             self.status.configure(foreground='blue')
+            
         def showHelpLeave(self):
             self.statusText.set(self.statusStr)
             self.status.configure(foreground='black')
